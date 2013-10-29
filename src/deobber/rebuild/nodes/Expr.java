@@ -1,5 +1,11 @@
 package deobber.rebuild.nodes;
 
-public class Expr extends Node {
+public abstract class Expr extends CodeNode {
+
+	public final Type type;
+
+	public Expr(Type type) {
+		this.type = type;
+	}
 
 }

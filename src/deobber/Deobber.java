@@ -1,13 +1,11 @@
 package deobber;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.tree.ClassNode;
-
-import deobber.process.ControlFlowProcess;
-import deobber.process.TryCatchProcess;
+import deobber.pass.ControlFlowPass;
+import deobber.pass.HandlerPass;
+import deobber.rebuild.Rebuilder;
+import deobber.rebuild.nodes.ClassNode;
 
 public class Deobber {
 
@@ -17,22 +15,21 @@ public class Deobber {
 		this.input = input;
 	}
 
-	public void execute() {
-		Map<String, byte[]> classesBytes = input.getClasses();
-		Map<String, ClassNode> classes = new HashMap<>();
-		for (String key : classesBytes.keySet()) {
-			byte[] bytes = classesBytes.get(key);
-			ClassReader cr = new ClassReader(bytes);
-			ClassNode cNode = new ClassNode();
-			cr.accept(cNode, 0);
-			classes.put(key, cNode);
+	public Context execute() {
+		Context ctx = new Context();
+		ctx.setInput(input.getClasses());
+		Rebuilder builder = new Rebuilder();
+		for (String name : ctx.getInput().keySet()) {
+			byte[] classBytes = ctx.getClassBytes(name);
+
+			ClassNode cNode = builder.build(ctx, classBytes);
+
+			ctx.addClass(name, cNode);
+			
 		}
-		if (classes == null) {
-			throw new IllegalArgumentException();
-		}
-		Context context = new Context();
-		new TryCatchProcess(context, classes).execute();
-		new ControlFlowProcess(context, classes).execute();
+		new HandlerPass(ctx).execute();
+		new ControlFlowPass(ctx).execute();
+		return ctx;
 	}
 
 }
