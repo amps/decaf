@@ -3,14 +3,15 @@ package deobber.rebuild.nodes;
 import java.nio.ByteBuffer;
 
 import deobber.Context;
+import deobber.rebuild.Constants;
 import deobber.rebuild.nodes.attributes.Attribute;
 import deobber.rebuild.nodes.attributes.ConstantValue;
 import deobber.rebuild.nodes.visitors.StructureVisitor;
 
-public class FieldNode extends TreeNode {
+public class FieldNode extends MemberNode {
 
-	public static FieldNode construct(Context ctx, ConstantPool constantPool,
-			ByteBuffer buffer) {
+	public static FieldNode construct(Context ctx, ClassNode parent,
+			ConstantPool constantPool, ByteBuffer buffer) {
 
 		short accessFlags = buffer.getShort();
 		short nameIndex = buffer.getShort();
@@ -19,23 +20,22 @@ public class FieldNode extends TreeNode {
 		String descStr = constantPool.getString(descIndex).replaceAll("/", ".");
 		Class<?> desc = Descriptor.parse(ctx, descStr).get(0);
 
-		FieldNode node = new FieldNode(name, accessFlags, desc);
+		FieldNode node = new FieldNode(parent, name, accessFlags, desc);
 		short attrCount = buffer.getShort();
 		for (int j = 0; j < attrCount; j++) {
-			Attribute attr = Attribute.construct(constantPool, buffer);
+			Attribute attr = Attribute.construct(node, constantPool, buffer);
 			node.addAttribute(attr);
 		}
 		return node;
 	}
 
-	public final String name;
-	public final short access;
 	public final Class<?> desc;
+	public final ClassNode parent;
 	public ConstantValue constant;
 
-	public FieldNode(String name, short access, Class<?> desc) {
-		this.name = name;
-		this.access = access;
+	public FieldNode(ClassNode parent, String name, short access, Class<?> desc) {
+		super(parent, name, access);
+		this.parent = parent;
 		this.desc = desc;
 	}
 
@@ -46,14 +46,25 @@ public class FieldNode extends TreeNode {
 		}
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof FieldNode == false) {
+			return false;
+		}
+		FieldNode b = (FieldNode) o;
+		return name.equals(b.name) && access == b.access && desc == b.desc
+				&& parent.name.equals(b.parent.name);
+	}
+
 	public void accept(StructureVisitor visitor) {
 		super.accept(visitor);
 		visitor.enterField(this);
 		visitor.exitField(this);
 	}
 
-	public boolean hasAccess(int type) {
-		return (access & type) == type;
+	@Override
+	public String toString() {
+		return parent.name + "." + name + "("+desc.getSimpleName()+")";
 	}
 
 }

@@ -1,5 +1,5 @@
 package deobber.rebuild.nodes;
 
-public class JumpStmtNode extends StmtNode {
+public class JumpStmtNode extends Stmt {
 
 }

@@ -3,8 +3,6 @@ package deobber.rebuild.nodes.visitors;
 import deobber.rebuild.nodes.ClassNode;
 import deobber.rebuild.nodes.FieldNode;
 import deobber.rebuild.nodes.MethodNode;
-import deobber.rebuild.nodes.Node;
-import deobber.rebuild.nodes.attributes.CodeAttribute;
 
 public interface StructureVisitor extends Visitor {
 

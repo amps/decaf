@@ -1,29 +1,19 @@
 package deobber.rebuild.nodes;
 
+import deobber.Context;
+
 public class Type {
+	public static Type NULL = new Type();
+	public final String descStr;
+	public final Descriptor desc;
 
-	public static final Type NONSPEC = new Type("");
-	public static final Type INT = new Type("I");
-	public static final Type LONG = new Type("J");
-	public static final Type FLOAT = new Type("F");
-	public static final Type DOUBLE = new Type("D");
-	public static final Type NULL = new Type("");
-	
-
-
-	public static Type get(String name) {
-		return new Type(name);
+	private Type() {
+		desc = null;
+		descStr = null;
 	}
 
-	public final String name;
-
-	
-	private Type(String name) {
-		this.name = name;
+	public Type(Context ctx, String desc) {
+		descStr = desc;
+		this.desc = Descriptor.parse(ctx, descStr);
 	}
-
-	public static Type fromDescriptor(Descriptor descriptor) {
-		return new Type(descriptor.toString());
-	}
-
 }

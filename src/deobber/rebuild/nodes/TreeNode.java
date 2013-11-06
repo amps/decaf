@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import deobber.rebuild.nodes.attributes.Attribute;
-import deobber.rebuild.nodes.visitors.StructureVisitor;
 
 public abstract class TreeNode extends Node {
 

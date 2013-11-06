@@ -1,6 +1,6 @@
 package deobber.rebuild.nodes;
 
-public class ExprStmt extends StmtNode {
+public class ExprStmt extends Stmt {
 
 	public final Expr expr;
 

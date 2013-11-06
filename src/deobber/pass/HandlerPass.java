@@ -9,7 +9,6 @@ import java.util.Set;
 
 import deobber.Context;
 import deobber.rebuild.nodes.ClassNode;
-import deobber.rebuild.nodes.InsnNode;
 import deobber.rebuild.nodes.MethodNode;
 import deobber.rebuild.nodes.TryCatchNode;
 import deobber.rebuild.nodes.Type;
@@ -27,7 +26,7 @@ public class HandlerPass extends Pass {
 				Map<Integer, List<TryCatchNode>> tryCatchPositions = new HashMap<>();
 				for (TryCatchNode tc : mn.getTryCatchNodes()) {
 
-					int handlerPos = mn.getCode().indexOf(tc.getHandler());
+					int handlerPos = mn.code.indexOf(tc.getHandler());
 					if (!tryCatchPositions.containsKey(handlerPos)) {
 						List<TryCatchNode> handlers = new LinkedList<>();
 						handlers.add(tc);
@@ -52,12 +51,12 @@ public class HandlerPass extends Pass {
 						}
 
 						for (TryCatchNode tc : tryCatches) {
-							int startPos_ = mn.getCode().indexOf(tc.getStart());
+							int startPos_ = mn.code.indexOf(tc.getStart());
 							if (startPos_ < startPos) {
 								startPos = startPos_;
 							}
 
-							int endPos_ = mn.getCode().indexOf(tc.getEnd());
+							int endPos_ = mn.code.indexOf(tc.getEnd());
 							if (endPos_ > endPos) {
 								endPos = endPos_;
 							}

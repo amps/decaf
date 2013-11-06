@@ -2,12 +2,15 @@ package deobber.rebuild.nodes;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import deobber.Context;
+import deobber.rebuild.nodes.ConstantPool.MemberRef;
 
 public class ConstantPool {
 
-	public static ConstantPool construct(Context ctx, int size, ByteBuffer buffer) {
+	public static ConstantPool construct(Context ctx, int size,
+			ByteBuffer buffer) {
 		ConstantPool constantPool = new ConstantPool(ctx, size);
 		for (int i = 1; i < size; i++) {
 			byte tag = buffer.get();
@@ -129,20 +132,26 @@ public class ConstantPool {
 
 	}
 
-	public class ClassName extends Constant<Type> {
+	public class ClassName extends Constant<Class<?>> {
 
 		private int ref;
 
 		public ClassName(int ref) {
-			super(Type.NONSPEC);
+			super(int.class);
 			this.ref = ref;
 		}
 
 		@Override
-		public Type get() {
-			return Type.get(getString(ref));
+		public Class<?> get() {
+			try {
+				return ctx.loadClass(getString(ref).replaceAll("/", "."));
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				// e.printStackTrace();
+			}
+			return null;
 		}
-		
+
 		public String getName() {
 			return getString(ref);
 		}
@@ -166,11 +175,6 @@ public class ConstantPool {
 			return Descriptor.parse(ctx, getString(descIndex));
 		}
 
-		public Type getType() {
-			Descriptor descriptor = getDescriptor();
-			return Type.fromDescriptor(descriptor);
-		}
-
 	}
 
 	public class MemberRef {
@@ -182,7 +186,7 @@ public class ConstantPool {
 			this.ntIndex = ntIndex;
 		}
 
-		public Type getClassOwner() {
+		public Class<?> getClassOwner() {
 			return ConstantPool.this.getClass(classIndex);
 		}
 
@@ -190,9 +194,23 @@ public class ConstantPool {
 			return ConstantPool.this.getNameType(ntIndex);
 		}
 
+		public FieldNode getField() {
+			ClassNode cnode = ctx.getClassNode(getClassOwner());
+			if (cnode == null) {
+				return null;
+			}
+			for (FieldNode fnode : cnode.fields) {
+				if (fnode.name.equals(getNameType().getName())
+						&& fnode.desc == getNameType().getDescriptor().get(0)) {
+					return fnode;
+				}
+			}
+			return null;
+		}
+
 	}
 
-	private Constant<?>[] pool;
+	public final Constant<?>[] pool;
 	private final Context ctx;
 	public final int size;
 
@@ -226,7 +244,7 @@ public class ConstantPool {
 	}
 
 	public String getString(int i) {
-		return (String) pool[i].value;
+		return (String) pool[i].get();
 	}
 
 	public Constant<?> get(int i) {
@@ -266,19 +284,54 @@ public class ConstantPool {
 	}
 
 	public NameType getNameType(int i) {
-		return ((Constant<NameType>) pool[i]).value;
-	}
-	
-	public MemberRef getMemberRef(int i) {
-		return ((Constant<MemberRef>)pool[i]).value;
+		return ((Constant<NameType>) pool[i]).get();
 	}
 
-	public Type getClass(int i) {
-		Object value = pool[i].value;
+	public MemberRef getMemberRef(int i) {
+		return ((Constant<MemberRef>) pool[i]).get();
+	}
+
+	public Class<?> getClass(int i) {
+		Object value = pool[i].get();
 		if (value instanceof Integer && (Integer) value == 0) {
-			return Type.NONSPEC;
+			return null;
 		}
-		return (Type) value;
+		return (Class<?>) value;
+	}
+
+	public Iterator<MemberRef> memberRefs() {
+		return new Iterator<ConstantPool.MemberRef>() {
+			int i = 0;
+			boolean accessed = true;
+
+			@Override
+			public boolean hasNext() {
+
+				if (accessed) {
+					accessed = false;
+					while (i < pool.length && get(i).type != MemberRef.class) {
+						i++;
+					}
+					return i < pool.length && get(i).type == MemberRef.class;
+				}
+
+				return false;
+			}
+
+			@Override
+			public MemberRef next() {
+				if (!accessed) {
+					accessed = true;
+					return getMemberRef(i++);
+				}
+				return null;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
 	}
 
 }

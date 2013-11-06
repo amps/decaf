@@ -3,7 +3,7 @@ package deobber.rebuild.nodes.visitors;
 import deobber.rebuild.nodes.IfStmtNode;
 import deobber.rebuild.nodes.InsnNode;
 import deobber.rebuild.nodes.JumpStmtNode;
-import deobber.rebuild.nodes.StmtNode;
+import deobber.rebuild.nodes.Stmt;
 import deobber.rebuild.nodes.attributes.CodeAttribute;
 
 public interface CodeVisitor extends Visitor {
@@ -11,9 +11,9 @@ public interface CodeVisitor extends Visitor {
 
 	public void exitCode(CodeAttribute code);
 
-	public boolean enterStatement(StmtNode node);
+	public boolean enterStatement(Stmt node);
 
-	public void exitStatement(StmtNode node);
+	public void exitStatement(Stmt node);
 
 	public boolean enterIfStmt(IfStmtNode node);
 

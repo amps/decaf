@@ -8,7 +8,7 @@ import deobber.rebuild.nodes.InsnNode;
 import deobber.rebuild.nodes.JumpStmtNode;
 import deobber.rebuild.nodes.MethodNode;
 import deobber.rebuild.nodes.Node;
-import deobber.rebuild.nodes.StmtNode;
+import deobber.rebuild.nodes.Stmt;
 import deobber.rebuild.nodes.attributes.CodeAttribute;
 import deobber.rebuild.nodes.visitors.CodeVisitor;
 import deobber.rebuild.nodes.visitors.StructureVisitor;
@@ -75,13 +75,13 @@ public class ControlFlowPass extends Pass implements CodeVisitor, StructureVisit
 	}
 
 	@Override
-	public boolean enterStatement(StmtNode node) {
+	public boolean enterStatement(Stmt node) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void exitStatement(StmtNode node) {
+	public void exitStatement(Stmt node) {
 		// TODO Auto-generated method stub
 		
 	}

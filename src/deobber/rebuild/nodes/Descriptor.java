@@ -21,10 +21,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 			case 'Z': {
 
 				if (depth > 0) {
-					active.add(Array.newInstance(Boolean.class, depth)
+					active.add(Array.newInstance(boolean.class, new int[depth])
 							.getClass());
 				} else {
-					active.add(Boolean.class);
+					active.add(boolean.class);
 				}
 				depth = 0;
 				pos++;
@@ -33,9 +33,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 				break;
 			case 'B': {
 				if (depth > 0) {
-					active.add(Array.newInstance(Byte.class, depth).getClass());
+					active.add(Array.newInstance(byte.class, new int[depth])
+							.getClass());
 				} else {
-					active.add(Byte.class);
+					active.add(byte.class);
 				}
 				depth = 0;
 				pos++;
@@ -44,10 +45,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 				break;
 			case 'C': {
 				if (depth > 0) {
-					active.add(Array.newInstance(Character.class, depth)
+					active.add(Array.newInstance(char.class, new int[depth])
 							.getClass());
 				} else {
-					active.add(Character.class);
+					active.add(char.class);
 				}
 				depth = 0;
 				pos++;
@@ -55,9 +56,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 				break;
 			case 'S': {
 				if (depth > 0) {
-					active.add(Array.newInstance(Short.class, depth).getClass());
+					active.add(Array.newInstance(short.class, new int[depth])
+							.getClass());
 				} else {
-					active.add(Short.class);
+					active.add(short.class);
 				}
 				depth = 0;
 				pos++;
@@ -65,10 +67,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 				break;
 			case 'I': {
 				if (depth > 0) {
-					active.add(Array.newInstance(Integer.class, depth)
+					active.add(Array.newInstance(int.class, new int[depth])
 							.getClass());
 				} else {
-					active.add(Integer.class);
+					active.add(int.class);
 				}
 				depth = 0;
 				pos++;
@@ -76,9 +78,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 				break;
 			case 'J': {
 				if (depth > 0) {
-					active.add(Array.newInstance(Long.class, depth).getClass());
+					active.add(Array.newInstance(long.class, new int[depth])
+							.getClass());
 				} else {
-					active.add(Long.class);
+					active.add(long.class);
 				}
 				depth = 0;
 				pos++;
@@ -86,9 +89,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 				break;
 			case 'F': {
 				if (depth > 0) {
-					active.add(Array.newInstance(Float.class, depth).getClass());
+					active.add(Array.newInstance(float.class, new int[depth])
+							.getClass());
 				} else {
-					active.add(Float.class);
+					active.add(float.class);
 				}
 				depth = 0;
 				pos++;
@@ -96,10 +100,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 				break;
 			case 'D': {
 				if (depth > 0) {
-					active.add(Array.newInstance(Double.class, depth)
+					active.add(Array.newInstance(double.class, new int[depth])
 							.getClass());
 				} else {
-					active.add(Double.class);
+					active.add(double.class);
 				}
 				depth = 0;
 				pos++;
@@ -107,9 +111,10 @@ public class Descriptor extends ArrayList<Class<?>> {
 				break;
 			case 'V': {
 				if (depth > 0) {
-					active.add(Array.newInstance(Void.class, depth).getClass());
+					active.add(Array.newInstance(void.class, new int[depth])
+							.getClass());
 				} else {
-					active.add(Void.class);
+					active.add(void.class);
 				}
 				depth = 0;
 				pos++;
@@ -127,7 +132,8 @@ public class Descriptor extends ArrayList<Class<?>> {
 					try {
 						Class<?> cl = ctx.loadClass(name);
 						if (depth > 0) {
-							active.add(Array.newInstance(cl, depth).getClass());
+							active.add(Array.newInstance(cl, new int[depth])
+									.getClass());
 						} else {
 							active.add(cl);
 						}
@@ -139,10 +145,11 @@ public class Descriptor extends ArrayList<Class<?>> {
 
 				} else {
 					try {
+						name = name.replaceAll("/", ".");
 						if (depth > 0) {
 
 							active.add(Array.newInstance(Class.forName(name),
-									depth).getClass());
+									new int[depth]).getClass());
 						} else {
 							active.add(Class.forName(name));
 						}

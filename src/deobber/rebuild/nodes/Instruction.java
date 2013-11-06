@@ -1,5 +1,7 @@
 package deobber.rebuild.nodes;
 
+import deobber.rebuild.nodes.ins.FieldInsn;
+
 public enum Instruction {
 	nop((byte) 0x00), aconst_null((byte) 0x01), iconst_m1((byte) 0x02), iconst_0(
 			(byte) 0x03), iconst_1((byte) 0x04), iconst_2((byte) 0x05), iconst_3(
@@ -60,7 +62,7 @@ public enum Instruction {
 			(byte) 0xaa), lookupswitch((byte) 0xab), ireturn((byte) 0xac), lreturn(
 			(byte) 0xad), freturn((byte) 0xae), dreturn((byte) 0xaf), areturn(
 			(byte) 0xb0), return_((byte) 0xb1), getstatic((byte) 0xb2), putstatic(
-			(byte) 0xb3), getfield((byte) 0xb4), putfield((byte) 0xb5), invokevirtual(
+			(byte) 0xb3), getfield((byte) 0xb4, FieldInsn.class), putfield((byte) 0xb5, FieldInsn.class), invokevirtual(
 			(byte) 0xb6), invokespecial((byte) 0xb7), invokestatic((byte) 0xb8), invokeinterface(
 			(byte) 0xb9), invokedynamic((byte) 0xba), new_((byte) 0xbb), newarray(
 			(byte) 0xbc), anewarray((byte) 0xbd), arraylength((byte) 0xbe), athrow(
@@ -71,9 +73,15 @@ public enum Instruction {
 
 	breakpoint((byte) 0xca), impdep1((byte) 0xfe), impdep2((byte) 0xff);
 	public final byte code;
+	public Class<? extends InsnNode> insnType;
 
 	private Instruction(byte code) {
 		this.code = code;
+	}
+	
+	private Instruction(byte code, Class<? extends InsnNode> type) {
+		this.code = code;
+		this.insnType = type;
 	}
 
 	public static Instruction valueOf(byte code) {
@@ -84,5 +92,7 @@ public enum Instruction {
 		}
 		return null;
 	}
+	
+	
 
 }
