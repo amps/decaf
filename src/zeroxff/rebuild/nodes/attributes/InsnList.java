@@ -62,17 +62,22 @@ public class InsnList extends ArrayList<InsnNode> {
 		return code;
 	}
 
-	public InsnNode get(Instruction opcode, int num) {
+	public <T extends InsnNode> T get(Instruction opcode, int num) {
 		int i = 0;
+
 		for (InsnNode iNode : this) {
 			if (iNode.opcode == opcode) {
 				if (i == num) {
-					return iNode;
+					return (T) iNode;
 				}
 				i++;
 			}
 		}
 		return null;
+	}
+
+	public <T extends InsnNode> T get(Instruction opcode, int num, Class<T> type) {
+		return (T) get(opcode, num);
 	}
 
 }

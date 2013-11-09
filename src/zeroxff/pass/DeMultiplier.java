@@ -43,7 +43,7 @@ public class DeMultiplier extends Pass {
 							Instruction opcode = iNode.opcode;
 							switch (opcode) {
 							case ldc: {
-								int index = ByteUtils.toShort(iNode.args[0]);
+								int index = ByteUtils.toByte(iNode.args[0]);
 								Constant<?> constantWrap = cnode.constantPool
 										.get(index);
 								if (constantWrap.type == Integer.class) {
@@ -53,7 +53,7 @@ public class DeMultiplier extends Pass {
 							}
 								break;
 							case ldc_w: {
-								int index = ByteUtils.toShort(iNode.args);
+								int index = ByteUtils.toNumber(iNode.args).intValue();
 								Constant<?> constantWrap = cnode.constantPool
 										.get(index);
 								if (constantWrap.type == Integer.class) {
@@ -69,6 +69,7 @@ public class DeMultiplier extends Pass {
 							case putstatic: {
 								FieldInsn fin = (FieldInsn) iNode;
 								iStack.push(fin);
+
 							}
 								break;
 							case imul: {
@@ -109,8 +110,9 @@ public class DeMultiplier extends Pass {
 												.getField())) {
 											counts = tmpMultipliers.get(fin
 													.getField());
+
 											if (counts.containsKey(multi)) {
-												value = counts.get(multi);
+												value = counts.get(multi) + 1;
 											}
 										} else {
 											counts = new HashMap<>();
@@ -143,6 +145,7 @@ public class DeMultiplier extends Pass {
 			int winner = 0;
 			int winnerVal = Integer.MIN_VALUE;
 			for (int key : tmpMultipliers.get(node).keySet()) {
+
 				int count = tmpMultipliers.get(node).get(key);
 
 				if (count > winnerVal) {

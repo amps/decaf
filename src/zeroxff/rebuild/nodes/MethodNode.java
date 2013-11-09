@@ -14,9 +14,11 @@ import zeroxff.rebuild.nodes.cfg.Block;
 import zeroxff.rebuild.nodes.cfg.BlockPath;
 import zeroxff.rebuild.nodes.cfg.Block.BlockVisitor;
 import zeroxff.rebuild.nodes.ins.FieldInsn;
+import zeroxff.rebuild.nodes.ins.InsnSearcher;
+import zeroxff.rebuild.nodes.ins.InstructionSearchable;
 import zeroxff.rebuild.nodes.visitors.StructureVisitor;
 
-public class MethodNode extends MemberNode {
+public class MethodNode extends MemberNode implements InstructionSearchable {
 
 	public static MethodNode construct(Context ctx, ClassNode parent,
 			ConstantPool constantPool, ByteBuffer buffer) {
@@ -112,44 +114,33 @@ public class MethodNode extends MemberNode {
 		return insns;
 	}
 
-	public List<InsnList> search(final Instruction... opcodes) {
-		final List<InsnList> foundTotal = new ArrayList<>();
+	public InsnSearcher search(final Instruction... opcodes) {
+		final InsnSearcher searcher = new InsnSearcher(opcodes);
 		code.getFlow().new Traverser().traverse(new BlockVisitor() {
 			@Override
 			public Object visit(Block block, Block parent, BlockPath path) {
-				int position = 0;
-				InsnList found = null;
-				for (Iterator<InsnNode> inIt = path.allInstructionsIterator(); inIt
-						.hasNext();) {
-					InsnNode iNode = inIt.next();
-
-					Instruction opcode = iNode.opcode;
-
-					if (opcodes[position] == null
-							|| opcode == opcodes[position]) {
-						if (position == 0) {
-							found = new InsnList();
-						}
-						found.add(iNode);
-						position++;
-						if (position == opcodes.length) {
-
-							foundTotal.add(found);
-							position = 0;
-						}
-					} else {
-						position = 0;
-
-					}
-				}
+				searcher.search(path.allInstructions());
 				return null;
 			}
 
 		});
-		return foundTotal;
+
+		return searcher;
 	}
 
 	public Object traverse(BlockVisitor blockVisitor) {
 		return code.getFlow().new Traverser().traverse(blockVisitor);
 	}
+
+	@Override
+	public Iterable<InsnNode> getInstructions() {
+		return code.instructions;
+	}
+
+	@Override
+	public Iterable<InstructionSearchable> getInstructionSets() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

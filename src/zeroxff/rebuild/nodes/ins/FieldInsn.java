@@ -5,6 +5,7 @@ import static zeroxff.rebuild.nodes.Instruction.getstatic;
 import static zeroxff.rebuild.nodes.Instruction.putfield;
 import static zeroxff.rebuild.nodes.Instruction.putstatic;
 import zeroxff.ByteUtils;
+import zeroxff.rebuild.nodes.ClassNode;
 import zeroxff.rebuild.nodes.FieldNode;
 import zeroxff.rebuild.nodes.InsnNode;
 import zeroxff.rebuild.nodes.Instruction;
@@ -15,7 +16,12 @@ public class FieldInsn extends InsnNode {
 
 	public FieldInsn(int line, Instruction instruction, byte[] args) {
 		super(line, instruction, args);
-		index = ByteUtils.toShort(args);
+		index = ByteUtils.toNumber(args).intValue();
+	}
+
+	public FieldInsn(InsnNode node) {
+		this(node.line, node.opcode, node.args);
+		this.code = node.code;
 	}
 
 	public FieldNode getField() {

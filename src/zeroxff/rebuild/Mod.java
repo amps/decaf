@@ -1,6 +1,7 @@
 package zeroxff.rebuild;
 
 import zeroxff.rebuild.nodes.MemberNode;
+import zeroxff.rebuild.nodes.MethodNode;
 
 public class Mod {
 	public final static Mod STATIC = new Mod(new ModCheck() {
@@ -67,6 +68,40 @@ public class Mod {
 			@Override
 			public boolean check(MemberNode member) {
 				return member.name.equals(name);
+			}
+		});
+	}
+
+	public static Mod HASPARAMS(final Class<?>... param) {
+		return new Mod(new ModCheck() {
+			@Override
+			public boolean check(MemberNode member) {
+				if (member instanceof MethodNode == false) {
+					return false;
+				}
+				MethodNode mNode = (MethodNode) member;
+				if (param.length != mNode.params.size()) {
+					return false;
+				}
+				for (int i = 0; i < mNode.params.size(); i++) {
+					if (mNode.params.get(i).equals(param[i]) == false) {
+						return false;
+					}
+				}
+				return true;
+			}
+		});
+	}
+
+	public static Mod RETURNS(final Class<?> clz) {
+		return new Mod(new ModCheck() {
+			@Override
+			public boolean check(MemberNode member) {
+				if (member instanceof MethodNode == false) {
+					return false;
+				}
+				MethodNode mNode = (MethodNode) member;
+				return mNode.desc == clz;
 			}
 		});
 	}

@@ -1,6 +1,11 @@
 package zeroxff.rebuild.nodes;
 
+import java.util.Arrays;
+
 import zeroxff.rebuild.nodes.ins.FieldInsn;
+import zeroxff.rebuild.nodes.ins.IntInsn;
+import zeroxff.rebuild.nodes.ins.JumpInsn;
+import zeroxff.rebuild.nodes.ins.VarInsn;
 
 public enum Instruction {
 	nop((byte) 0x00), aconst_null((byte) 0x01), iconst_m1((byte) 0x02), iconst_0(
@@ -61,11 +66,9 @@ public enum Instruction {
 			(byte) 0xa6), goto_((byte) 0xa7), jsr((byte) 0xa8), ret((byte) 0xa9), tableswitch(
 			(byte) 0xaa), lookupswitch((byte) 0xab), ireturn((byte) 0xac), lreturn(
 			(byte) 0xad), freturn((byte) 0xae), dreturn((byte) 0xaf), areturn(
-			(byte) 0xb0), return_((byte) 0xb1), getstatic((byte) 0xb2,
-			FieldInsn.class), putstatic((byte) 0xb3, FieldInsn.class), getfield(
-			(byte) 0xb4, FieldInsn.class), putfield((byte) 0xb5,
-			FieldInsn.class), invokevirtual((byte) 0xb6), invokespecial(
-			(byte) 0xb7), invokestatic((byte) 0xb8), invokeinterface(
+			(byte) 0xb0), return_((byte) 0xb1), getstatic((byte) 0xb2), putstatic(
+			(byte) 0xb3), getfield((byte) 0xb4), putfield((byte) 0xb5), invokevirtual(
+			(byte) 0xb6), invokespecial((byte) 0xb7), invokestatic((byte) 0xb8), invokeinterface(
 			(byte) 0xb9), invokedynamic((byte) 0xba), new_((byte) 0xbb), newarray(
 			(byte) 0xbc), anewarray((byte) 0xbd), arraylength((byte) 0xbe), athrow(
 			(byte) 0xbf), checkcast((byte) 0xc0), instanceof_((byte) 0xc1), monitorenter(
@@ -77,13 +80,27 @@ public enum Instruction {
 	public final byte code;
 	public Class<? extends InsnNode> insnType;
 
-	private Instruction(byte code) {
-		this.code = code;
+	static {
+		for (Instruction code : Instruction.values()) {
+			Class<? extends InsnNode> insnType = null;
+			if (InstructionSets.VAR_INSNS.contains(code)) {
+				insnType = VarInsn.class;
+			} else if (InstructionSets.FIELD_INSNS.contains(code)) {
+				insnType = FieldInsn.class;
+			} else if (InstructionSets.JUMP_INSNS.contains(code)) {
+				insnType = JumpInsn.class;
+			} else if (InstructionSets.INT_INSNS.contains(code)) {
+				insnType = IntInsn.class;
+			} else {
+				insnType = InsnNode.class;
+			}
+			code.insnType = insnType;
+		}
 	}
 
-	private Instruction(byte code, Class<? extends InsnNode> type) {
+	private Instruction(byte code) {
 		this.code = code;
-		this.insnType = type;
+
 	}
 
 	public static Instruction valueOf(byte code) {

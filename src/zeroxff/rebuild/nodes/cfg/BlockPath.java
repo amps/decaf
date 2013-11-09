@@ -2,10 +2,16 @@ package zeroxff.rebuild.nodes.cfg;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import zeroxff.rebuild.nodes.InsnNode;
+import zeroxff.rebuild.nodes.Instruction;
+import zeroxff.rebuild.nodes.attributes.InsnList;
+import zeroxff.rebuild.nodes.ins.InsnSearcher;
+import zeroxff.rebuild.nodes.ins.InstructionSearchable;
 
-public class BlockPath extends ArrayList<Block> {
+public class BlockPath extends ArrayList<Block> implements
+		InstructionSearchable {
 
 	/**
 	 * 
@@ -96,4 +102,51 @@ public class BlockPath extends ArrayList<Block> {
 			}
 		};
 	}
+
+	public void search(InsnSearcher searcher) {
+		for (Block block : this) {
+			searcher.search(block);
+		}
+	}
+
+	public void printFields(int before, int after) {
+		for (Block block : this) {
+			block.printFields(before, after);
+		}
+	}
+
+	@Override
+	public Iterable<InsnNode> getInstructions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Iterable<InstructionSearchable> getInstructionSets() {
+		return new Iterable<InstructionSearchable>() {
+
+			@Override
+			public Iterator<InstructionSearchable> iterator() {
+				return new Iterator<InstructionSearchable>() {
+					Iterator<Block> blockIter = BlockPath.this.iterator();
+
+					@Override
+					public boolean hasNext() {
+						return blockIter.hasNext();
+					}
+
+					@Override
+					public InstructionSearchable next() {
+						return blockIter.next();
+					}
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+				};
+			}
+		};
+	}
+
 }

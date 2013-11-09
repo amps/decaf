@@ -44,13 +44,13 @@ public class DeDuplicate extends Pass implements InstructionVisitor {
 
 		long time = System.currentTimeMillis(), originalTime = time;
 		int[] pass = pass();
-		while (pass[0] > 0 || pass[1] > 0 || pass[2] > 0) {
-			removedMethods += pass[0];
-			removedFields += pass[1];
-			removedClasses += pass[2];
-			pass = pass();
+		// while (pass[0] > 0 || pass[1] > 0 || pass[2] > 0) {
+		removedMethods += pass[0];
+		removedFields += pass[1];
+		removedClasses += pass[2];
+		// pass = pass();
 
-		}
+		// }
 		Log.log(Log.INFO, "Removed %d unused classes (%d%%)", removedClasses,
 				Math.round(((float) removedClasses / (float) classes) * 100));
 		Log.log(Log.INFO, "Removed %d unused methods (%d%%)", removedMethods,
@@ -69,7 +69,7 @@ public class DeDuplicate extends Pass implements InstructionVisitor {
 		usedFields = new HashMap<>();
 		usedMethods = new HashMap<>();
 		usedClasses = new HashSet<>();
-		Log.log(Log.TRACE, "DeDup Pass");
+		Log.log(Log.TRACE, "DeDuplicator Pass");
 		for (ClassNode node : context.getClasses()) {
 			for (MethodNode mnode : node.methods) {
 				mnode.code.accept(this);

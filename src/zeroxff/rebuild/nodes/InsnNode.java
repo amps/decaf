@@ -11,7 +11,7 @@ import zeroxff.rebuild.nodes.attributes.CodeAttribute;
 import zeroxff.rebuild.nodes.attributes.InsnList;
 import zeroxff.rebuild.nodes.visitors.InstructionVisitor;
 
-public abstract class InsnNode extends Node {
+public class InsnNode extends Node {
 	private static Map<Byte, Integer> specialCaseStack = new HashMap<>();
 
 	// TODO Move into enum
@@ -122,6 +122,7 @@ public abstract class InsnNode extends Node {
 		} else {
 			Constructor<? extends InsnNode> cons;
 			try {
+			//	System.out.println(ins+"::"+ins.insnType);
 				cons = ins.insnType.getConstructor(int.class,
 						Instruction.class, new byte[0].getClass());
 				node = cons.newInstance(line, ins, args);

@@ -8,10 +8,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import zeroxff.rebuild.nodes.FieldNode;
 import zeroxff.rebuild.nodes.InsnNode;
 import zeroxff.rebuild.nodes.Instruction;
+import zeroxff.rebuild.nodes.attributes.InsnList;
+import zeroxff.rebuild.nodes.ins.FieldInsn;
+import zeroxff.rebuild.nodes.ins.InsnSearcher;
+import zeroxff.rebuild.nodes.ins.InstructionSearchable;
 
-public class Block extends CFGNode {
+public class Block extends CFGNode implements InstructionSearchable {
 
 	public final List<InsnNode> instructions = new ArrayList<>();
 
@@ -80,7 +85,7 @@ public class Block extends CFGNode {
 
 		public final Block block;
 
-		private final List<Block> discovered = new ArrayList<>();
+		private final List<BlockPath> discovered = new ArrayList<>();
 
 		public Traverser() {
 			this.block = Block.this;
@@ -96,12 +101,17 @@ public class Block extends CFGNode {
 		private Object traverseAct(Block block, Block parent,
 				BlockVisitor visitor, BlockPath path) {
 
-			discovered.add(block);
 			BlockPath pathCopy = new BlockPath(path);
 			pathCopy.add(block);
-			Object found = visitor.visit(block, parent, pathCopy);
-			if (found != null) {
-				return found;
+			if (discovered.contains(pathCopy)) {
+				return null;
+			}
+			discovered.add(pathCopy);
+			if (block.isEnd()) {
+				Object found = visitor.visit(block, parent, pathCopy);
+				if (found != null) {
+					return found;
+				}
 			}
 
 			Collections.sort(block.children, new Comparator<Block>() {
@@ -118,9 +128,7 @@ public class Block extends CFGNode {
 				}
 			});
 			for (Block child : block.children) {
-				if (!discovered.contains(child)) {
-					traverseAct(child, block, visitor, pathCopy);
-				}
+				traverseAct(child, block, visitor, pathCopy);
 			}
 			return null;
 		}
@@ -128,6 +136,38 @@ public class Block extends CFGNode {
 
 	private boolean isImmediate(Block block) {
 		return immediates.contains(block);
+	}
+
+	public void printFields(int before, int after) {
+		System.out.println(this);
+		for (int i = 0; i < instructions.size(); i++) {
+			InsnNode iNode = instructions.get(i);
+			if (iNode instanceof FieldInsn) {
+				FieldInsn fin = (FieldInsn) iNode;
+				FieldNode fNode = fin.getField();
+				for (int j = before; j >= 1; j--) {
+					try {
+						InsnNode at = instructions.get(i - j);
+						System.out.println(at.line + ": " + at);
+					} catch (Exception e) {
+
+					}
+				}
+				InsnNode t = instructions.get(i);
+				System.out.println("** " + t.line + ": " + t);
+				for (int j = 1; j < after; j++) {
+					try {
+						InsnNode at = instructions.get(i + j);
+						System.out.println(at.line + ": " + at);
+					} catch (Exception e) {
+
+					}
+				}
+				System.out.println(fNode);
+				System.out.println("=============");
+			}
+		}
+
 	}
 
 	public void reorg() {
@@ -149,4 +189,16 @@ public class Block extends CFGNode {
 		}
 
 	}
+
+	@Override
+	public Iterable<InsnNode> getInstructions() {
+		return instructions;
+	}
+
+	@Override
+	public Iterable<InstructionSearchable> getInstructionSets() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
